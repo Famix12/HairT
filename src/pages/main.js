@@ -1,6 +1,6 @@
 import React from "react";
-import Logo from "./assets/Logo.svg";
-import "./index.css";
+import Logo from "../assets/Logo.svg";
+import "../index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container } from "react-bootstrap";
 
@@ -15,9 +15,9 @@ function MainPage() {
 
           <div className="main-p2 fadeInUp" >
             <h6 className="text-p2">
-                lorem ipsum dolor sit amet,consectetur adip occ occurence velit
-                sed diam non pro id elit. Ut enim ad minim veniam, quis nostrud ex
-                e a pos reprehenderit in ea reb
+            Our app offers personalized hair treatment recommendations based on your unique
+            hair type and needs, as well as expert tips and tutorials to help you achieve 
+            your hair goals.
             </h6>
 
             <Button variant="custom" className="btn-p2">

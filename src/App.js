@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { LoginForm, RegisterForm } from "./components/loginRegisterForm.js";
-import MainPage from "./main.js";
+import { LoginForm, RegisterForm } from "./pages/loginRegisterForm.js";
+import MainPage from "./pages/main.js";
 import NavbarM from "./components/navbar";
 import "./index.css";
 
