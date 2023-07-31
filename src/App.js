@@ -1,22 +1,25 @@
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { LoginForm, RegisterForm } from "./components/loginRegisterForm.js";
 import MainPage from "./main.js";
 import NavbarM from "./components/navbar";
-import Login from "./login.js";
 import "./index.css";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState("main");
-
-  //   LoginBtn = () => {
-
-  //   };
-
   return (
     <>
-      {/* LB={LoginBtn} */}
-      <NavbarM />
+      <body>
+        <NavbarM />
 
-      {currentPage === "main" ? <MainPage /> : <Login />}
+        <BrowserRouter>
+          <Routes>
+            <Route index element={<MainPage />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+          </Routes>
+        </BrowserRouter>
+      </body>
     </>
   );
 }
