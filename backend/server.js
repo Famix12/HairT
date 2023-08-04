@@ -1,38 +1,67 @@
+require('dotenv').config()
 const express = require("express");
 const mysql = require("mysql2");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
+const slat = 10;
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin : ["http://localhost:3000"],
+  methods : ["GET", "POST"],
+  credentials : true
+}));
 app.use(express.json());
+app.use(cookieParser())
+
 
 const db = mysql.createConnection(
   'mysql://p2ahpc95mazbpsowp5vd:pscale_pw_bph2dgIoKyIUtzS7txuw5YVBmcPENVtKn6dwc9lixf5@aws.connect.psdb.cloud/hairt?ssl={"rejectUnauthorized":true}'
 );
 
-app.get("/", (req, res) => {
-    const sql = "SELECT * FROM users"
-  db.query(sql, function (err, data) {
-    if (err) return res.json(err);
-    return res.json(data);
 
-  });
+const verifyUser = (req, res, next) => {
+  console.log(req.cookies)
+  const check_token = req.cookies.token;
+  if(!check_token){
+    return res.json("not authorized")
+  }else {
+    jwt.verify(check_token, process.env.PRIVATE_KEY, (err, decoded) =>{
+      if(err) {
+        return res.json(err)
+    } else {
+        res.username = decoded.username;
+        next();
+    }
+    })
+  }
+}
+
+
+app.get("/",  verifyUser ,(req, res) => {
+    return res.json({status : "Success", username :req.username})
 });
 
 
 app.post("/register", (req, res) => {
-  req.value = [
-    req.body.username,
-    req.body.email,
-    req.body.password,
-    req.body.DOB,
-  ]
-  const sql = `INSERT INTO users (username, email, password, dob) VALUES('${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.DOB}');`
-
   
-  db.query(sql, (err, data) => {
+  bcrypt.hash(req.body.password.toString(), slat, (err, hash) => {
     if (err) return res.json(err);
-    return res.json(data);
+    values = [
+      req.body.username,
+      req.body.email,
+      hash,
+      req.body.DOB,
+    ]
+    // '${req.body.username}', '${req.body.email}', '${req.body.password}', '${req.body.DOB}'
+    const sql = `INSERT INTO users (username, email, password, dob) VALUES(?);`
+
+    db.query(sql, [values] ,(err, data) => {
+      if (err) return res.json(err);
+      return res.json(data);
+    })
   })
 });
 
@@ -42,25 +71,48 @@ app.post("/login", (req, res) => {
   //   req.body.email,
   //   req.body.password
   // ]
-  const sql = "SELECT * FROM users WHERE `email` = ? AND `password` = ?;"
+  const sql = "SELECT * FROM users WHERE `email` = ? ;"
 
-  
-  db.query(sql, [req.body.email,req.body.password] ,(err, data) => {
+  db.query(sql, [req.body.email] ,(err, data) => {
     if (err) return res.json(err);
     if(data.length > 0) {
-      return res.json("Success")
+      bcrypt.compare(req.body.password.toString(), data[0].password, (err, response)=>{
+        if (err) return res.json(err);
+        if (response){
+
+          /*
+          Data schema :
+            {
+              id: 12,
+              username: '',
+              email: '',
+              password: '',
+              dob: 
+            }
+          
+            // console.log(data)
+            */
+
+          const username = data[0].username
+          const token = jwt.sign({username}, process.env.PRIVATE_KEY, {expiresIn : '1d'});
+          res.cookie('token', token);
+          return res.json("Success");
+        }else {
+          return res.json(['Wrong password'])
+        }
+      })
     } 
     else {
-      return res.json(["Your password or email is invalid"])
+      return res.json(["No email existed !"])
     };
   })
 });
 
 
-// app.get("/", (req, res) => {
-
-
-// })
+app.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  return res.json({success : "Success"})
+})
 
 
 app.listen(8081, ()=>{

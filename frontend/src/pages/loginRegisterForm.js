@@ -1,4 +1,4 @@
-import React, { useState,  } from "react";
+import React, { useState } from "react";
 import { Form, Button, Container, Row, Col, Nav, Modal } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { Prev } from "react-bootstrap/esm/PageItem";
@@ -16,7 +16,8 @@ function LoginForm() {
   // const [email, setEmail] = useState("");
   // const [password, setPassword] = useState("");
 
-  const navigate = useNavigate()
+  axios.defaults.withCredentials = true;
+  const navigate = useNavigate();
   const [err, setErr] = useState({});
 
   const [LoginValues, setLoginValues] = useState({
@@ -33,28 +34,25 @@ function LoginForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setErr({})
+    // setErr({})
     setErr(LoginValidator(LoginValues));
 
-    if(err.email !== '' || err.password !== '') {
-      console.log("error occurred", err)
-    }else{
-     
-      const _api = 'http://localhost:8081/login';
+    if (err.email !== "" || err.password !== "") {
+      console.log("error occurred", err);
+    } else {
+      const _api = "http://localhost:8081/login";
 
-      axios.post(_api, LoginValues ).then(response => {
-        if(response.data === 'Success'){
-          navigate('/home')
-        }else {
-
-         global.loginerr = response.data[0]
-
-        }
-      }).catch(err => console.log(err));
+      axios.post(_api, LoginValues).then((response) => {
+          if (response.data === "Success") {
+            navigate("/home");
+          } else {
+            global.loginerr = response.data[0];
+          }
+          
+        }).catch((err) => console.log(err));
 
       // console.log("no error occurred")
     }
-
   };
 
   return (
@@ -65,7 +63,12 @@ function LoginForm() {
             <h1 className="LRHeader fadeInDown">Login</h1>
             <Form className="LRform fadeInUp" onSubmit={handleSubmit}>
               <Form.Group controlId="formBasicEmail">
-                {global.loginerr && <span className="text-danger">{global.loginerr}<br/></span>}
+                {global.loginerr && (
+                  <span className="text-danger">
+                    {global.loginerr}
+                    <br />
+                  </span>
+                )}
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
                   type="email"
@@ -143,7 +146,6 @@ function LoginForm() {
 }
 
 function RegisterForm() {
-
   function formatDate(date) {
     var d = new Date(date),
       month = "" + (d.getMonth() + 1),
@@ -156,7 +158,8 @@ function RegisterForm() {
     return [year, month, day].join("-");
   }
 
-  const navigate = useNavigate()
+  axios.defaults.withCredentials = true;
+  const navigate = useNavigate();
   const [err, setErr] = useState({});
 
   const [RegisterValues, setRegisterValues] = useState({
@@ -175,20 +178,25 @@ function RegisterForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setErr({})
+    // setErr({})
     setErr(RegisterValidator(RegisterValues));
 
-    if( err.username !== '' || err.email !== '' || err.password !== '' || err.DOB !== '') {
-      console.log("error occurred", err)
-    }else{
-     
-      const _api = 'http://localhost:8081/register';
+    if (
+      err.username === "" &&
+      err.email === "" &&
+      err.password === "" &&
+      err.DOB === ""
+    ) {
+      const _api = "http://localhost:8081/register";
 
-      axios.post(_api, RegisterValues ).then(response => {
-        navigate('/')
-      }).catch(err => console.log(err));
-
-      // console.log("no error occurred")
+      axios
+        .post(_api, RegisterValues)
+        .then((response) => {
+          navigate("/");
+        })
+        .catch((err) => console.log(err));
+    } else {
+      console.log("error occurred", err);
     }
   };
 
@@ -249,9 +257,7 @@ function RegisterForm() {
                 onChange={HandleInput}
               />
               {err.DOB && (
-                <Form.Label className="text-danger">
-                  {err.DOB}
-                </Form.Label>
+                <Form.Label className="text-danger">{err.DOB}</Form.Label>
               )}
             </Form.Group>
 
