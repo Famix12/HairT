@@ -32,6 +32,8 @@ function LoginForm() {
     }));
   };
 
+  // var loginerrLength
+
   const handleSubmit = (event) => {
     event.preventDefault();
     // setErr({})
@@ -43,13 +45,31 @@ function LoginForm() {
       const _api = "http://localhost:8081/login";
 
       axios.post(_api, LoginValues).then((response) => {
-          if (response.data === "Success") {
-            navigate("/home");
-          } else {
-            global.loginerr = response.data[0];
-          }
           
-        }).catch((err) => console.log(err));
+          if (response.data.Success === "Success") {
+            
+            // global.UserEmail = LoginValues.email
+            // console.log("/home")
+            // window.location.reload(true);
+            // global.userToken = response.data.token
+            sessionStorage.setItem("userToken", `${response.data.token}`)
+            navigate("/home");
+
+          } else {
+            console.log(response.data.err)
+            // console.log((response.data.err).length)
+            
+            global.loginerr = response.data.err;
+            global.loginerrLength  = response.data.err;
+            global.loginerrLength = global.loginerrLength.length
+            // console.log(global.loginerr, loginerrLength > 1)
+            // console.log(loginerrLength) --> 14
+            // if(typeof(response.data.err) != "undefined"){
+            // }
+
+           }
+          
+        }).catch((err) => console.log("err login :",err));
 
       // console.log("no error occurred")
     }
@@ -63,12 +83,7 @@ function LoginForm() {
             <h1 className="LRHeader fadeInDown">Login</h1>
             <Form className="LRform fadeInUp" onSubmit={handleSubmit}>
               <Form.Group controlId="formBasicEmail">
-                {global.loginerr && (
-                  <span className="text-danger">
-                    {global.loginerr}
-                    <br />
-                  </span>
-                )}
+                { global.loginerrLength > 1  && (<p className="text-danger">{global.loginerr}</p>)}
                 <Form.Label>Email address</Form.Label>
                 <Form.Control
                   type="email"
@@ -146,17 +161,7 @@ function LoginForm() {
 }
 
 function RegisterForm() {
-  function formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
+  
 
   axios.defaults.withCredentials = true;
   const navigate = useNavigate();
@@ -194,7 +199,7 @@ function RegisterForm() {
         .then((response) => {
           navigate("/");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log("err1",err));
     } else {
       console.log("error occurred", err);
     }
@@ -216,7 +221,7 @@ function RegisterForm() {
                 onChange={HandleInput}
               />
               {err.username && (
-                <Form.Label className="text-danger">{err.username}</Form.Label>
+                <Form.Label className="text-danger fadeInUp">{err.username}</Form.Label>
               )}
             </Form.Group>
 
@@ -230,7 +235,7 @@ function RegisterForm() {
                 onChange={HandleInput}
               />
               {err.email && (
-                <Form.Label className="text-danger">{err.email}</Form.Label>
+                <Form.Label className="text-danger fadeInUp">{err.email}</Form.Label>
               )}
             </Form.Group>
 
@@ -244,7 +249,7 @@ function RegisterForm() {
                 onChange={HandleInput}
               />
               {err.password && (
-                <Form.Label className="text-danger">{err.password}</Form.Label>
+                <Form.Label className="text-danger fadeInUp">{err.password}</Form.Label>
               )}
             </Form.Group>
 
@@ -257,7 +262,7 @@ function RegisterForm() {
                 onChange={HandleInput}
               />
               {err.DOB && (
-                <Form.Label className="text-danger">{err.DOB}</Form.Label>
+                <Form.Label className="text-danger fadeInUp">{err.DOB}</Form.Label>
               )}
             </Form.Group>
 

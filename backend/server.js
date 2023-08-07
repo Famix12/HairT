@@ -23,7 +23,7 @@ const db = mysql.createConnection(
 
 
 const verifyUser = (req, res, next) => {
-  console.log(req.cookies)
+  // console.log(req.cookies)
   const check_token = req.cookies.token;
   if(!check_token){
     return res.json("not authorized")
@@ -93,20 +93,41 @@ app.post("/login", (req, res) => {
             // console.log(data)
             */
 
-          const username = data[0].username
-          const token = jwt.sign({username}, process.env.PRIVATE_KEY, {expiresIn : '1d'});
+          const email = data[0].email
+          const token = jwt.sign({email}, process.env.PRIVATE_KEY, {expiresIn : '1d'});
           res.cookie('token', token);
-          return res.json("Success");
+          // module.exports = token;
+          return res.json({Success :"Success", token : token});
         }else {
-          return res.json(['Wrong password'])
+          return res.json({err :'Wrong password'})
         }
       })
     } 
     else {
-      return res.json(["No email existed !"])
+      return res.json({err :"No email existed !"})
     };
   })
 });
+
+app.post('/profile', (req, res) => {
+  try{
+    // console.log(req.body[0])
+  const decoded = jwt.verify(req.body[0], process.env.PRIVATE_KEY);
+  // console.log(decoded);
+
+  const sql = `SELECT username, email, dob FROM users WHERE email = '${decoded.email}';`
+
+  db.query(sql, (err, data) => {
+    if (err) return res.json(err);
+    return res.json(data);
+  })
+  // return res.json(decoded.email);
+  }
+  catch(e){
+    console.log(e)
+    return res.json(e.message);
+  }
+})
 
 
 app.get('/logout', (req, res) => {

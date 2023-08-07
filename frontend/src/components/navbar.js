@@ -14,7 +14,8 @@ function NavbarM() {
   const [auth, setAutuh] = useState(false);
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
     axios
@@ -22,27 +23,30 @@ function NavbarM() {
       .then((response) => {
         if (response.data.status === "Success") {
           setAutuh(true);
-          console.log(response.data);
           setUsername(response.data.username);
-          // window.location.reload();
-          // location.reload(true)
-
-          navigate("/home");
+          if (!hasRedirected) {
+            // Perform the redirect only once
+            navigate("/home");
+            setHasRedirected(true);
+          }
         } else {
           setAutuh(false);
-          // global.loginerr = response.data[0];
+          global.loginerr = response.data[0];
         }
       })
-      .catch((err) => console.log('useEffect', err));
-  }, []);
-
+      .catch((err) => console.log("useEffect", err));
+  }, [navigate, hasRedirected]); // Add hasRedirected as a dependency
 
   const HnadleLogout = () => {
-    axios.get("http://localhost:8081/logout")
-    .then(response=> {
-      window.location.reload();
-    }).catch((err) => console.log('HnadleLogout', err)); 
-  }
+    axios
+    .get("http://localhost:8081/logout")
+    .then((response) => {
+      // window.location.reload();
+        sessionStorage.clear()
+        navigate('/')
+      })
+      .catch((err) => console.log("HnadleLogout", err));
+  };
 
   return (
     <>
@@ -67,14 +71,18 @@ function NavbarM() {
                 title="settings"
                 id="collasible-nav-dropdown"
               >
-                <NavDropdown.Item className="" href="/account">
-                  <AiOutlineUser /> Account
-                </NavDropdown.Item>
-                <NavDropdown.Item  onClick={HnadleLogout}> 
+                <Link to={"/profile"}>
+                  <NavDropdown.Item href="/profile">
+                    <AiOutlineUser /> Account
+                  </NavDropdown.Item>
+                </Link>
+                <NavDropdown.Item onClick={HnadleLogout}>
                   <AiOutlineLogout /> Logout
                 </NavDropdown.Item>
               </NavDropdown>
-
+              <Nav.Link>
+                <h1>{username}</h1>
+              </Nav.Link>
               {/* <Nav.Label>{username}</Nav.Label> */}
             </Nav>
           </Navbar.Collapse>

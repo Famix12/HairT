@@ -3,6 +3,7 @@ import Logo from "../assets/Logo.svg";
 import "../index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 function MainPage() {
   return ( 
@@ -20,9 +21,11 @@ function MainPage() {
             your hair goals.
             </h6>
 
+          <Link to={'/qs'}>
             <Button variant="custom" className="btn-p2">
               Start
             </Button>
+          </Link>
           </div>
         </div>
       </Container>
