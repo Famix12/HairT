@@ -34,6 +34,13 @@ function LoginForm() {
 
   // var loginerrLength
 
+
+  const handleResetPass = (event) => {
+    // event.preventDefault();
+    console.log(event.target.value);
+  }
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
     // setErr({})
@@ -136,11 +143,12 @@ function LoginForm() {
           <Modal.Title>Reset your password</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
+          <Form onSubmit={handleResetPass}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Enter your Email :</Form.Label>
               <Form.Control
                 type="email"
+                name="R-Email"
                 placeholder="name@example.com"
                 autoFocus
               />
@@ -151,7 +159,7 @@ function LoginForm() {
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button type="submit" variant="primary" onClick={handleClose}>
+          <Button type="submit" variant="primary" onClick={handleResetPass}>
             Send
           </Button>
         </Modal.Footer>

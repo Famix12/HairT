@@ -97,6 +97,7 @@ app.post("/login", (req, res) => {
           const token = jwt.sign({email}, process.env.PRIVATE_KEY, {expiresIn : '1d'});
           res.cookie('token', token);
           // module.exports = token;
+          // console.log("Success");
           return res.json({Success :"Success", token : token});
         }else {
           return res.json({err :'Wrong password'})
